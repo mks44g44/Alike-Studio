@@ -1,0 +1,9 @@
+{
+  "name": "com.alike.runtime",
+  "displayName": "Alike Runtime",
+  "version": "1.0.0",
+  "unity": "2021.3",
+  "description": "Plays skeletal animations exported from Alike Studio (.alkb binary or .json + atlas): bones, meshes, weights, IK, transform, path, physics and slider constraints, skins, events with sound, multi-track mixing, clipping.",
+  "keywords": ["animation", "2d", "skeletal", "alike"],
+  "author": { "name": "Alike" }
+}

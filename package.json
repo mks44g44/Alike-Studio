@@ -1,0 +1,144 @@
+{
+  "name": "alike-studio",
+  "productName": "Alike Studio",
+  "version": "4.3.0",
+  "description": "Alike Studio: a 2D skeletal animation editor",
+  "author": "Alike",
+  "homepage": "https://example.com/alike-studio",
+  "license": "UNLICENSED",
+  "main": "main.js",
+  "scripts": {
+    "bundle": "node tools/build-bundle.js",
+    "prestart": "node tools/build-bundle.js",
+    "start": "electron .",
+    "predist": "node tools/build-bundle.js",
+    "dist": "electron-builder --win nsis portable --x64 --publish never",
+    "cli": "electron . --cli",
+    "dist:win": "electron-builder --win nsis portable --x64 --publish never",
+    "dist:linux": "electron-builder --linux AppImage deb tar.xz --x64 --arm64 --publish never",
+    "dist:mac": "electron-builder --mac zip --x64 --arm64 --publish never",
+    "predist:win": "node tools/build-bundle.js",
+    "predist:linux": "node tools/build-bundle.js",
+    "predist:mac": "node tools/build-bundle.js"
+  },
+  "build": {
+    "appId": "com.alike.studio",
+    "productName": "Alike Studio",
+    "executableName": "Alike",
+    "copyright": "\u00a9 2026 Alike",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "index.html",
+      "css/**",
+      "js/**",
+      "assets/**",
+      "samples/**",
+      "README.md"
+    ],
+    "fileAssociations": [
+      {
+        "ext": "alike",
+        "name": "Alike Project",
+        "description": "Alike Studio project",
+        "icon": "assets/icon.ico"
+      }
+    ],
+    "win": {
+      "icon": "assets/icon.ico",
+      "target": [
+        "nsis",
+        "portable"
+      ],
+      "signAndEditExecutable": false,
+      "extraFiles": [
+        {
+          "from": "tools/alike-cli.cmd",
+          "to": "alike-cli.cmd"
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Alike Studio",
+      "artifactName": "Alike-Studio-Setup-${version}.exe"
+    },
+    "portable": {
+      "artifactName": "Alike-Studio-${version}-portable.exe"
+    },
+    "afterPack": "tools/after-pack.js",
+    "publish": null,
+    "extraResources": [
+      {
+        "from": "engines",
+        "to": "engines"
+      },
+      {
+        "from": "runtime",
+        "to": "runtime"
+      }
+    ],
+    "electronLanguages": [
+      "en",
+      "en-US"
+    ],
+    "compression": "maximum",
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb",
+        "tar.xz"
+      ],
+      "icon": "assets/icon-1024.png",
+      "executableName": "alike",
+      "category": "Graphics",
+      "synopsis": "2D skeletal animation editor",
+      "description": "Alike Studio: a 2D skeletal animation editor with meshes, weights, IK, physics and a timeline.",
+      "maintainer": "Alike <alike@example.invalid>",
+      "vendor": "Alike",
+      "executableArgs": [],
+      "extraFiles": [
+        {
+          "from": "tools/alike-cli.sh",
+          "to": "alike-cli"
+        }
+      ],
+      "artifactName": "Alike-Studio-${version}-${arch}.${ext}",
+      "desktop": {
+        "StartupWMClass": "Alike Studio"
+      }
+    },
+    "deb": {
+      "artifactName": "alike-studio_${version}_${arch}.${ext}",
+      "packageName": "alike-studio"
+    },
+    "mac": {
+      "target": [
+        "zip"
+      ],
+      "icon": "assets/icon.icns",
+      "category": "public.app-category.graphics-design",
+      "identity": null,
+      "hardenedRuntime": false,
+      "gatekeeperAssess": false,
+      "darkModeSupport": true,
+      "artifactName": "Alike-Studio-${version}-mac-${arch}.${ext}",
+      "extendInfo": {
+        "NSHighResolutionCapable": true
+      },
+      "executableName": "Alike Studio"
+    }
+  },
+  "devDependencies": {
+    "electron": "33.2.0",
+    "electron-builder": "25.1.8",
+    "resedit": "2.0.3",
+    "pe-library": "1.0.1"
+  }
+}

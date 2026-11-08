@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Alike Studio</title>
+<link rel="stylesheet" href="css/alike.css">
+<link rel="icon" href="assets/icon.png">
+</head>
+<body data-mode="setup">
+<div id="app">
+  <header id="topbar">
+    <div class="brand"><img class="logo-img" src="assets/icon.png" alt=""> Alike <span class="brand-sub">Studio</span></div>
+    <nav id="menubar"></nav>
+    <div id="modeSwitch" class="seg big"></div>
+    <div class="flex"></div>
+    <div class="top-hint">Tab switches mode · ? for shortcuts</div>
+  </header>
+  <div id="main">
+    <aside id="toolrail"></aside>
+    <section id="center">
+      <div id="vpWrap">
+        <div id="viewport" tabindex="0"></div>
+        <div id="vpHud"></div>
+        <div id="vpEmpty" hidden>
+          <div class="ve-title">Start a new skeleton</div>
+          <div class="ve-text">Drop images, a Photoshop file (PSD), sounds or exported skeleton data (.json / .skel / .alkb + .atlas) here.</div>
+          <div class="ve-btns">
+            <button class="btn primary" data-act="images">Import images…</button>
+            <button class="btn" data-act="psd">Import PSD…</button>
+            <button class="btn" data-act="data">Import data…</button>
+            <button class="btn" data-act="open">Open project…</button>
+            <button class="btn" data-act="demo">Open example</button>
+            <button class="btn" data-act="tutorial">Tutorial</button>
+          </div>
+        </div>
+      </div>
+      <div id="splitTL" class="split-h"></div>
+      <div id="timeline"></div>
+    </section>
+    <div id="splitSide" class="split-v"></div>
+    <aside id="side">
+      <div id="treePanel" class="panel"></div>
+      <div id="splitTree" class="split-h"></div>
+      <div id="propsPanel" class="panel"></div>
+    </aside>
+  </div>
+  <footer id="statusbar"></footer>
+</div>
+<div id="dropHint">Drop images to import (onto the viewport = add to selected bone) · drop a .alike file to open</div>
+
+<script src="js/math.js"></script>
+<script src="js/model.js"></script>
+<script src="js/pose.js"></script>
+<script src="js/render.js"></script>
+<script src="js/editor.js"></script>
+<script src="js/meshops.js"></script>
+<script src="js/animstate.js"></script>
+<script src="js/binary.js"></script>
+<script src="js/atlas.js"></script>
+<script src="js/gif.js"></script>
+<script src="js/psd.js"></script>
+<script src="js/runtime-src.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/formats.js"></script>
+<script src="js/actions.js"></script>
+<script src="js/viewport.js"></script>
+<script src="js/tree.js"></script>
+<script src="js/props.js"></script>
+<script src="js/folders.js"></script>
+<script src="js/skeletons.js"></script>
+<script src="js/timeline.js"></script>
+<script src="js/io.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/preview.js"></script>
+<script src="js/problems.js"></script>
+<script src="js/texpack.js"></script>
+<script src="js/imagesync.js"></script>
+<script src="js/importer.js"></script>
+<script src="js/tutorial.js"></script>
+<script src="js/cli.js"></script>
+<script src="js/demo.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

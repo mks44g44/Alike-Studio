@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Alike Player</title>
+<style>
+  :root { --bg: #16181d; --panel: #20232a; --text: #d9dce2; --dim: #8a909b; --accent: #ff8a3d; }
+  html { height: 100%; }
+  body { margin: 0; height: 100%; display: flex; flex-direction: column; background: var(--bg); color: var(--text); font: 13px system-ui, "Segoe UI", sans-serif; }
+  header { display: flex; gap: 10px; align-items: center; padding: 8px 12px; background: var(--panel); flex-wrap: wrap; }
+  header b { color: var(--accent); }
+  select, button, input { font: inherit; }
+  #stage { flex: 1; position: relative; min-height: 0; }
+  #stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .hint { color: var(--dim); }
+  #log { position: absolute; left: 12px; bottom: 10px; color: #ffe27a; font-weight: 600; pointer-events: none; }
+</style>
+</head>
+<body>
+<header>
+  <b>◆ Alike Player</b>
+  <label>Export files: <input id="files" type="file" multiple accept=".json,.alkb,.png,audio/*"></label>
+  <select id="anim" title="Track 0"></select>
+  <select id="layer" title="Track 1 (layered on top)"><option value="">no layer</option></select>
+  <label>mix <input id="mix" type="number" value="0.2" step="0.05" min="0" style="width:56px">s</label>
+  <select id="skin"></select>
+  <label><input id="phys" type="checkbox" checked> physics</label>
+  <span class="hint">Pick everything from an unzipped Alike runtime export (.json or .alkb, the .png pages, optional audio/).</span>
+</header>
+<div id="stage"><canvas id="cv"></canvas><div id="log"></div></div>
+
+<script src="../js/math.js"></script>
+<script src="../js/model.js"></script>
+<script src="../js/pose.js"></script>
+<script src="../js/render.js"></script>
+<script src="../js/animstate.js"></script>
+<script src="../js/binary.js"></script>
+<script src="../js/atlas.js"></script>
+<script>
+/* Example: playing an Alike export with the JavaScript runtime (pose.js + render.js + animstate.js). */
+(function () {
+  const cv = document.getElementById('cv'), R = new A.GLRenderer(cv);
+  const $ = (id) => document.getElementById(id);
+  let data = null, images = {}, sounds = {}, phys = {}, state = null, last = performance.now(), cam = { x: 0, y: 150, zoom: 1 };
+
+  $('files').addEventListener('change', async (e) => {
+    const files = [...e.target.files];
+    const bin = files.find((f) => f.name.endsWith('.alkb')), jf = files.find((f) => f.name.endsWith('.json'));
+    if (!bin && !jf) return alert('Choose the exported .json or .alkb file too');
+    data = bin ? A.Binary.decode(await bin.arrayBuffer()) : JSON.parse(await jf.text());
+    images = {}; sounds = {};
+    if (data.atlas) for (const page of data.atlas.pages) {
+      const pf = files.find((f) => f.name === page.file); if (!pf) { alert('Missing ' + page.file); continue; }
+      const img = await createImageBitmap(pf, { premultiplyAlpha: 'none' });
+      for (const name in page.regions) {
+        const c = A.Atlas.sliceRegion(img, page.regions[name]);
+        if (data.atlas.pma) { // atlas is premultiplied: undo it so the renderer can premultiply again
+          const x = c.getContext('2d'), id = x.getImageData(0, 0, c.width, c.height), d = id.data;
+          for (let i = 0; i < d.length; i += 4) { const a = d[i + 3] / 255; if (a > 0) { d[i] = Math.min(255, d[i] / a); d[i + 1] = Math.min(255, d[i + 1] / a); d[i + 2] = Math.min(255, d[i + 2] / a); } }
+          x.putImageData(id, 0, 0);
+        }
+        images[name] = c;
+      }
+    }
+    for (const a of data.audio || []) { const f = files.find((x) => a.file.endsWith(x.name)); if (f) sounds[a.name] = URL.createObjectURL(f); }
+    const sk = data.skeleton;
+    $('anim').innerHTML = sk.animations.map((a) => `<option>${a.name}</option>`).join('');
+    $('layer').innerHTML = '<option value="">no layer</option>' + sk.animations.map((a) => `<option>${a.name}</option>`).join('');
+    $('skin').innerHTML = sk.skins.map((s) => `<option>${s.name}</option>`).join('');
+    state = new A.AnimationState(sk);
+    state.listeners.push((ev) => {
+      $('log').textContent = '⚡ ' + ev.name + (ev.string ? ' "' + ev.string + '"' : '');
+      const def = A.Model.event(sk, ev.name);
+      if (def && def.audio && sounds[def.audio]) { const au = new Audio(sounds[def.audio]); au.volume = Math.max(0, Math.min(1, ev.volume != null ? ev.volume : def.volume)); au.play().catch(() => {}); }
+    });
+    state.setAnimation(0, sk.animations[0].name, true);
+    phys = {};
+  });
+  $('anim').onchange = () => { state.defaultMix = parseFloat($('mix').value) || 0; state.setAnimation(0, $('anim').value, true); };
+  $('layer').onchange = () => { if ($('layer').value) { const e = state.setAnimation(1, $('layer').value, true); e.alpha = 1; } else state.clearTrack(1); };
+  $('skin').onchange = () => { phys = {}; };
+
+  (function loop(now) {
+    const dt = Math.min(0.1, (now - last) / 1000); last = now;
+    const r = cv.getBoundingClientRect(); R.resize(r.width, r.height, devicePixelRatio || 1);
+    if (data && state) {
+      state.update(dt);
+      const pose = new A.Pose({ skeleton: data.skeleton }, $('skin').value || 'default');
+      state.apply(pose);
+      pose.update($('phys').checked ? dt : 0, phys);
+      R.begin(cam); R.drawPose(pose, { images });
+    }
+    requestAnimationFrame(loop);
+  })(performance.now());
+})();
+</script>
+</body>
+</html>

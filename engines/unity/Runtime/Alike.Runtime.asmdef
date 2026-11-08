@@ -1,0 +1,9 @@
+{
+  "name": "Alike.Runtime",
+  "rootNamespace": "Alike",
+  "references": [],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "autoReferenced": true
+}

@@ -1,0 +1,9 @@
+{
+  "name": "Alike.Editor",
+  "rootNamespace": "Alike.Unity.Editor",
+  "references": ["Alike.Runtime"],
+  "includePlatforms": ["Editor"],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "autoReferenced": true
+}
